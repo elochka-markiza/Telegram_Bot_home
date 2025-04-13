@@ -3,6 +3,8 @@ import sys
 from telegram.ext import Updater, MessageHandler, Filters
 from telegram.error import TelegramError
 from error_handler import handle_error  # Импортируем функцию обработки ошибок
+from db import save_user  # импорт функции из db.py
+
 
 # Безопасное чтение токена из файла
 def get_token():
@@ -30,7 +32,11 @@ def get_token():
 # Эхо-обработчик
 def echo(update, context):
     try:
-        context.bot.send_message(chat_id=update.effective_chat.id, text=update.message.text)
+        user = update.effective_user
+        save_user(user)
+        context.bot.send_message(
+            chat_id=update.effective_chat.id, text=f'Привет, {user.first_name}!'
+            )
     except TelegramError as e:
         handle_error(e, "❗ Ошибка при отправке сообщения")
 
